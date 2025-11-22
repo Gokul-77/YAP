@@ -8,6 +8,7 @@ import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
 import Chat from './pages/Chat';
 import Streaming from './pages/Streaming';
+import AdminPanel from './pages/AdminPanel';
 import './index.css';
 
 function App() {
@@ -26,6 +27,7 @@ function App() {
         <Route path="/login" element={!isAuthenticated ? <Login /> : <Navigate to="/dashboard" />} />
         <Route path="/register" element={!isAuthenticated ? <Register /> : <Navigate to="/dashboard" />} />
         <Route path="/dashboard" element={isAuthenticated ? <Dashboard /> : <Navigate to="/login" />} />
+        <Route path="/admin" element={isAuthenticated ? <AdminPanel /> : <Navigate to="/login" />} />
         <Route path="/chat" element={isAuthenticated ? <Chat /> : <Navigate to="/login" />} />
         <Route path="/chat/:roomId" element={isAuthenticated ? <Chat /> : <Navigate to="/login" />} />
         <Route path="/streaming" element={isAuthenticated ? <Streaming /> : <Navigate to="/login" />} />
