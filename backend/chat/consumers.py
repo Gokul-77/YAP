@@ -29,21 +29,37 @@ class ChatConsumer(AsyncWebsocketConsumer):
     # Receive message from WebSocket
     async def receive(self, text_data):
         text_data_json = json.loads(text_data)
-        message = text_data_json['message']
-        user_id = text_data_json.get('user_id') # Temporary: pass user_id from frontend until Auth Middleware is ready
+        message_type = text_data_json.get('type', 'chat_message')
+        
+        if message_type == 'reaction_update':
+            # Broadcast reaction update to all users in the room
+            await self.channel_layer.group_send(
+                self.room_group_name,
+                {
+                    'type': 'reaction_update',
+                    'message_id': text_data_json.get('message_id'),
+                    'emoji': text_data_json.get('emoji'),
+                    'user_id': text_data_json.get('user_id'),
+                    'action': text_data_json.get('action')
+                }
+            )
+        else:
+            # Handle chat message
+            message = text_data_json['message']
+            user_id = text_data_json.get('user_id')
 
-        # Save message to database
-        await self.save_message(user_id, message)
+            # Save message to database
+            await self.save_message(user_id, message)
 
-        # Send message to room group
-        await self.channel_layer.group_send(
-            self.room_group_name,
-            {
-                'type': 'chat_message',
-                'message': message,
-                'user_id': user_id
-            }
-        )
+            # Send message to room group
+            await self.channel_layer.group_send(
+                self.room_group_name,
+                {
+                    'type': 'chat_message',
+                    'message': message,
+                    'user_id': user_id
+                }
+            )
 
     # Receive message from room group
     async def chat_message(self, event):
@@ -54,6 +70,17 @@ class ChatConsumer(AsyncWebsocketConsumer):
         await self.send(text_data=json.dumps({
             'message': message,
             'user_id': user_id
+        }))
+    
+    # Handle reaction updates
+    async def reaction_update(self, event):
+        # Send reaction update to WebSocket
+        await self.send(text_data=json.dumps({
+            'type': 'reaction_update',
+            'message_id': event['message_id'],
+            'emoji': event.get('emoji'),
+            'user_id': event.get('user_id'),
+            'action': event.get('action')
         }))
 
     @database_sync_to_async
