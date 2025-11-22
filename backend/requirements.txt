@@ -1,0 +1,8 @@
+django
+djangorestframework
+djangorestframework-simplejwt
+channels[daphne]
+psycopg2-binary
+celery
+redis
+django-cors-headers
