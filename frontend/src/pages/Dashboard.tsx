@@ -14,31 +14,23 @@ export default function Dashboard() {
 
     return (
         <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-            {/* Header */}
             <header className="bg-white dark:bg-gray-800 shadow-sm">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
                     <h1 className="text-2xl font-bold text-gray-900 dark:text-white">YAP Dashboard</h1>
                     <div className="flex items-center gap-4">
-                        <button
-                            onClick={toggleTheme}
-                            className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
-                        >
+                        <button onClick={toggleTheme} className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
                             {theme === 'light' ? '🌙' : '☀️'}
                         </button>
                         <div className="text-sm text-gray-700 dark:text-gray-300">
                             {user?.username} <span className="text-xs text-gray-500">({user?.role})</span>
                         </div>
-                        <button
-                            onClick={handleLogout}
-                            className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors"
-                        >
+                        <button onClick={handleLogout} className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors">
                             Logout
                         </button>
                     </div>
                 </div>
             </header>
 
-            {/* Main Content */}
             <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
                 {!user?.is_approved && (
                     <div className="mb-6 p-4 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg">
@@ -49,11 +41,7 @@ export default function Dashboard() {
                 )}
 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {/* Chat Card */}
-                    <Link
-                        to="/chat"
-                        className="p-6 bg-white dark:bg-gray-800 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 hover:-translate-y-1"
-                    >
+                    <Link to="/chat" className="p-6 bg-white dark:bg-gray-800 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 hover:-translate-y-1">
                         <div className="flex items-center gap-4">
                             <div className="p-3 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
                                 <svg className="w-8 h-8 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -67,11 +55,7 @@ export default function Dashboard() {
                         </div>
                     </Link>
 
-                    {/* Streaming Card */}
-                    <Link
-                        to="/streaming"
-                        className="p-6 bg-white dark:bg-gray-800 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 hover:-translate-y-1"
-                    >
+                    <Link to="/streaming" className="p-6 bg-white dark:bg-gray-800 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 hover:-translate-y-1">
                         <div className="flex items-center gap-4">
                             <div className="p-3 bg-purple-100 dark:bg-purple-900/30 rounded-lg">
                                 <svg className="w-8 h-8 text-purple-600 dark:text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -85,8 +69,7 @@ export default function Dashboard() {
                         </div>
                     </Link>
 
-                    {/* Profile Card */}
-                    <div className="p-6 bg-white dark:bg-gray-800 rounded-xl shadow-lg">
+                    <Link to="/profile" className="p-6 bg-white dark:bg-gray-800 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 hover:-translate-y-1">
                         <div className="flex items-center gap-4">
                             <div className="p-3 bg-green-100 dark:bg-green-900/30 rounded-lg">
                                 <svg className="w-8 h-8 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -98,14 +81,10 @@ export default function Dashboard() {
                                 <p className="text-sm text-gray-500 dark:text-gray-400">Account Settings</p>
                             </div>
                         </div>
-                    </div>
+                    </Link>
 
-                    {/* Admin Panel Card (Only for Admins) */}
                     {user?.role === 'ADMIN' && (
-                        <Link
-                            to="/admin"
-                            className="p-6 bg-white dark:bg-gray-800 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 hover:-translate-y-1"
-                        >
+                        <Link to="/admin" className="p-6 bg-white dark:bg-gray-800 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 hover:-translate-y-1">
                             <div className="flex items-center gap-4">
                                 <div className="p-3 bg-red-100 dark:bg-red-900/30 rounded-lg">
                                     <svg className="w-8 h-8 text-red-600 dark:text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -120,31 +99,6 @@ export default function Dashboard() {
                             </div>
                         </Link>
                     )}
-                </div>
-
-                {/* User Info */}
-                <div className="mt-8 p-6 bg-white dark:bg-gray-800 rounded-xl shadow-lg">
-                    <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">Account Information</h2>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                            <p className="text-sm text-gray-500 dark:text-gray-400">Username</p>
-                            <p className="text-lg font-medium text-gray-900 dark:text-white">{user?.username}</p>
-                        </div>
-                        <div>
-                            <p className="text-sm text-gray-500 dark:text-gray-400">Email</p>
-                            <p className="text-lg font-medium text-gray-900 dark:text-white">{user?.email}</p>
-                        </div>
-                        <div>
-                            <p className="text-sm text-gray-500 dark:text-gray-400">Role</p>
-                            <p className="text-lg font-medium text-gray-900 dark:text-white">{user?.role}</p>
-                        </div>
-                        <div>
-                            <p className="text-sm text-gray-500 dark:text-gray-400">Status</p>
-                            <p className="text-lg font-medium text-gray-900 dark:text-white">
-                                {user?.is_approved ? '✅ Approved' : '⏳ Pending Approval'}
-                            </p>
-                        </div>
-                    </div>
                 </div>
             </main>
         </div>

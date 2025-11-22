@@ -6,6 +6,7 @@ import Landing from './pages/Landing';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
+import Profile from './pages/Profile';
 import Chat from './pages/Chat';
 import Streaming from './pages/Streaming';
 import AdminPanel from './pages/AdminPanel';
@@ -27,6 +28,7 @@ function App() {
         <Route path="/login" element={!isAuthenticated ? <Login /> : <Navigate to="/dashboard" />} />
         <Route path="/register" element={!isAuthenticated ? <Register /> : <Navigate to="/dashboard" />} />
         <Route path="/dashboard" element={isAuthenticated ? <Dashboard /> : <Navigate to="/login" />} />
+        <Route path="/profile" element={isAuthenticated ? <Profile /> : <Navigate to="/login" />} />
         <Route path="/admin" element={isAuthenticated ? <AdminPanel /> : <Navigate to="/login" />} />
         <Route path="/chat" element={isAuthenticated ? <Chat /> : <Navigate to="/login" />} />
         <Route path="/chat/:roomId" element={isAuthenticated ? <Chat /> : <Navigate to="/login" />} />

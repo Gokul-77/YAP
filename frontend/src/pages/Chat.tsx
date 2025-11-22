@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../store/authStore';
 import api from '../lib/api';
 
@@ -17,18 +17,31 @@ interface ChatRoom {
     is_paid: boolean;
 }
 
+interface User {
+    id: number;
+    username: string;
+    email: string;
+    role: string;
+}
+
 export default function Chat() {
     const { roomId } = useParams();
+    const navigate = useNavigate();
     const { user } = useAuthStore();
     const [rooms, setRooms] = useState<ChatRoom[]>([]);
+    const [users, setUsers] = useState<User[]>([]);
     const [messages, setMessages] = useState<Message[]>([]);
     const [newMessage, setNewMessage] = useState('');
     const [ws, setWs] = useState<WebSocket | null>(null);
+    const [showUserList, setShowUserList] = useState(false);
     const messagesEndRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
         // Fetch chat rooms
         api.get('/chat/rooms/').then((res) => setRooms(res.data)).catch(console.error);
+
+        // Fetch users for starting new chats
+        api.get('/users/').then((res) => setUsers(res.data)).catch(console.error);
     }, []);
 
     useEffect(() => {
@@ -45,7 +58,7 @@ export default function Chat() {
             setMessages((prev) => [...prev, {
                 id: Date.now(),
                 content: data.message,
-                sender: { id: data.user_id, username: 'User' },
+                sender: { id: data.user_id, username: data.username || 'User' },
                 timestamp: new Date().toISOString(),
             }]);
         };
@@ -67,22 +80,65 @@ export default function Chat() {
         ws.send(JSON.stringify({
             message: newMessage,
             user_id: user.id,
+            username: user.username,
         }));
 
         setNewMessage('');
     };
 
+    const startChatWithUser = async (userId: number) => {
+        try {
+            const response = await api.post('/chat/rooms/create_direct/', { user_id: userId });
+            setShowUserList(false);
+            navigate(`/chat/${response.data.id}`);
+            // Refresh rooms list
+            const roomsRes = await api.get('/chat/rooms/');
+            setRooms(roomsRes.data);
+        } catch (error) {
+            console.error('Error creating chat:', error);
+        }
+    };
+
     return (
         <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex">
             {/* Sidebar - Chat Rooms */}
-            <div className="w-80 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700">
+            <div className="w-80 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 flex flex-col">
                 <div className="p-4 border-b border-gray-200 dark:border-gray-700">
                     <Link to="/dashboard" className="text-blue-600 dark:text-blue-400 hover:underline text-sm">
                         ← Back to Dashboard
                     </Link>
-                    <h2 className="text-xl font-bold text-gray-900 dark:text-white mt-2">Chats</h2>
+                    <div className="flex items-center justify-between mt-2">
+                        <h2 className="text-xl font-bold text-gray-900 dark:text-white">Chats</h2>
+                        <button
+                            onClick={() => setShowUserList(!showUserList)}
+                            className="px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white text-sm rounded-lg transition-colors"
+                        >
+                            + New Chat
+                        </button>
+                    </div>
                 </div>
-                <div className="overflow-y-auto h-[calc(100vh-80px)]">
+
+                {/* User List for New Chats */}
+                {showUserList && (
+                    <div className="p-4 border-b border-gray-200 dark:border-gray-700 bg-blue-50 dark:bg-blue-900/20">
+                        <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Start a conversation</h3>
+                        <div className="space-y-2 max-h-64 overflow-y-auto">
+                            {users.map((u) => (
+                                <button
+                                    key={u.id}
+                                    onClick={() => startChatWithUser(u.id)}
+                                    className="w-full text-left p-2 rounded hover:bg-blue-100 dark:hover:bg-blue-900/30 transition-colors"
+                                >
+                                    <p className="font-medium text-gray-900 dark:text-white">{u.username}</p>
+                                    <p className="text-xs text-gray-500 dark:text-gray-400">{u.role}</p>
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+                )}
+
+                {/* Rooms List */}
+                <div className="overflow-y-auto flex-1">
                     {rooms.map((room) => (
                         <Link
                             key={room.id}
@@ -97,6 +153,12 @@ export default function Chat() {
                             <p className="text-sm text-gray-500 dark:text-gray-400">{room.type}</p>
                         </Link>
                     ))}
+                    {rooms.length === 0 && !showUserList && (
+                        <div className="p-4 text-center text-gray-500 dark:text-gray-400">
+                            <p className="mb-2">No chats yet</p>
+                            <p className="text-sm">Click "+ New Chat" to start a conversation</p>
+                        </div>
+                    )}
                 </div>
             </div>
 
@@ -113,10 +175,13 @@ export default function Chat() {
                                 >
                                     <div
                                         className={`max-w-xs lg:max-w-md px-4 py-2 rounded-2xl ${msg.sender.id === user?.id
-                                            ? 'bg-blue-600 text-white'
-                                            : 'bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-white'
+                                                ? 'bg-blue-600 text-white'
+                                                : 'bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-white'
                                             }`}
                                     >
+                                        {msg.sender.id !== user?.id && (
+                                            <p className="text-xs opacity-70 mb-1">{msg.sender.username}</p>
+                                        )}
                                         <p className="text-sm">{msg.content}</p>
                                         <p className="text-xs opacity-70 mt-1">
                                             {new Date(msg.timestamp).toLocaleTimeString()}
@@ -149,7 +214,13 @@ export default function Chat() {
                     </>
                 ) : (
                     <div className="flex-1 flex items-center justify-center">
-                        <p className="text-gray-500 dark:text-gray-400">Select a chat to start messaging</p>
+                        <div className="text-center">
+                            <svg className="w-24 h-24 mx-auto text-gray-300 dark:text-gray-600 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                            </svg>
+                            <p className="text-gray-500 dark:text-gray-400 text-lg">Select a chat to start messaging</p>
+                            <p className="text-gray-400 dark:text-gray-500 text-sm mt-2">or click "+ New Chat" to start a conversation</p>
+                        </div>
                     </div>
                 )}
             </div>
