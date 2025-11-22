@@ -22,6 +22,26 @@ class ChatRoomViewSet(viewsets.ModelViewSet):
     @action(detail=True, methods=['get'])
     def messages(self, request, pk=None):
         room = self.get_object()
+        
+        # Mark unread messages from other users as read
+        unread_messages = room.messages.filter(is_read=False).exclude(sender=request.user)
+        if unread_messages.exists():
+            unread_messages.update(is_read=True)
+            
+            # Notify group about read receipt
+            from channels.layers import get_channel_layer
+            from asgiref.sync import async_to_sync
+            
+            channel_layer = get_channel_layer()
+            async_to_sync(channel_layer.group_send)(
+                f'chat_{room.id}',
+                {
+                    'type': 'messages_read',
+                    'user_id': request.user.id,
+                    'username': request.user.username
+                }
+            )
+
         messages = room.messages.all().order_by('timestamp')
         serializer = MessageSerializer(messages, many=True, context={'request': request})
         return Response(serializer.data)

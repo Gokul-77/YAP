@@ -47,14 +47,22 @@ class ChatRoomSerializer(serializers.ModelSerializer):
     members = UserSerializer(many=True, read_only=True)
     display_name = serializers.SerializerMethodField()
     
+    last_message_time = serializers.SerializerMethodField()
+    
     class Meta:
         model = ChatRoom
-        fields = ['id', 'name', 'display_name', 'type', 'is_paid', 'price', 'members', 'last_message', 'created_at']
+        fields = ['id', 'name', 'display_name', 'type', 'is_paid', 'price', 'members', 'last_message', 'last_message_time', 'created_at']
     
     def get_last_message(self, obj):
         last_msg = obj.messages.order_by('-timestamp').first()
         if last_msg:
-            return MessageSerializer(last_msg, context=self.context).data
+            return last_msg.content
+        return None
+
+    def get_last_message_time(self, obj):
+        last_msg = obj.messages.order_by('-timestamp').first()
+        if last_msg:
+            return last_msg.timestamp
         return None
     
     def get_display_name(self, obj):

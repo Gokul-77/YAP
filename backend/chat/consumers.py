@@ -83,6 +83,15 @@ class ChatConsumer(AsyncWebsocketConsumer):
             'action': event.get('action')
         }))
 
+    # Handle read receipt updates
+    async def messages_read(self, event):
+        # Send read receipt to WebSocket
+        await self.send(text_data=json.dumps({
+            'type': 'messages_read',
+            'user_id': event['user_id'],
+            'username': event['username']
+        }))
+
     @database_sync_to_async
     def save_message(self, user_id, content):
         user = User.objects.get(id=user_id)
