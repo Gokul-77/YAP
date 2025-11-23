@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuthStore } from '../store/authStore';
 import api from '../lib/api';
+import BackButton from '../components/BackButton';
 
 interface StreamEvent {
     id: number;
@@ -41,10 +42,15 @@ export default function Streaming() {
             <header className="bg-white dark:bg-gray-800 shadow-sm">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
                     <div className="flex justify-between items-center">
+                        import BackButton from '../components/BackButton';
+
+                        // ... (imports)
+
+                        // ... (inside component)
                         <div>
-                            <Link to="/dashboard" className="text-blue-600 dark:text-blue-400 hover:underline text-sm">
-                                ← Back to Dashboard
-                            </Link>
+                            <div className="mb-2">
+                                <BackButton />
+                            </div>
                             <h1 className="text-2xl font-bold text-gray-900 dark:text-white mt-2">Live Streaming</h1>
                         </div>
                         {user?.role === 'ADMIN' && (

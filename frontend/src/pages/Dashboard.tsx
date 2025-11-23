@@ -1,104 +1,131 @@
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
+import { useState } from 'react';
 import { useAuthStore } from '../store/authStore';
 import { useThemeStore } from '../store/themeStore';
+import Sidebar from '../components/Sidebar';
+import { Menu } from 'lucide-react';
 
 export default function Dashboard() {
     const { user, logout } = useAuthStore();
     const { theme, toggleTheme } = useThemeStore();
     const navigate = useNavigate();
+    const [sidebarOpen, setSidebarOpen] = useState(false);
+    const [currentView, setCurrentView] = useState<string>('/dashboard');
 
     const handleLogout = () => {
         logout();
         navigate('/login');
     };
 
-    return (
-        <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-            <header className="bg-white dark:bg-gray-800 shadow-sm">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
-                    <h1 className="text-2xl font-bold text-gray-900 dark:text-white">YAP Dashboard</h1>
-                    <div className="flex items-center gap-4">
-                        <button onClick={toggleTheme} className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
-                            {theme === 'light' ? '🌙' : '☀️'}
-                        </button>
-                        <div className="text-sm text-gray-700 dark:text-gray-300">
-                            {user?.username} <span className="text-xs text-gray-500">({user?.role})</span>
-                        </div>
-                        <button onClick={handleLogout} className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors">
-                            Logout
-                        </button>
-                    </div>
-                </div>
-            </header>
+    const handleNavigation = (path: string) => {
+        setCurrentView(path);
+        navigate(path);
+    };
 
-            <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-                {!user?.is_approved && (
-                    <div className="mb-6 p-4 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg">
-                        <p className="text-yellow-800 dark:text-yellow-200">
-                            ⚠️ Your account is pending admin approval. Some features may be restricted.
+    const toggleSidebar = () => {
+        setSidebarOpen(!sidebarOpen);
+    };
+
+    return (
+        <div className="flex h-screen overflow-hidden bg-gray-50 dark:bg-gray-900">
+            {/* Mobile Menu Button */}
+            <button
+                onClick={toggleSidebar}
+                className="fixed top-4 left-4 z-30 md:hidden p-2 bg-gray-800 text-white rounded-lg shadow-lg"
+            >
+                <Menu size={24} />
+            </button>
+
+            {/* Sidebar */}
+            <Sidebar
+                isOpen={sidebarOpen}
+                onToggle={toggleSidebar}
+                currentPath={currentView}
+                onNavigate={handleNavigation}
+            />
+
+            {/* Main Content Area */}
+            <main className="flex-1 overflow-auto">
+                {/* Theme Toggle - Top Right */}
+                <div className="absolute top-4 right-4 z-20">
+                    <button
+                        onClick={toggleTheme}
+                        className="p-2 rounded-lg bg-white dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors shadow-md"
+                    >
+                        {theme === 'light' ? '🌙' : '☀️'}
+                    </button>
+                </div>
+
+                {/* Dashboard Content */}
+                <div className="p-6 md:p-8 mt-12 md:mt-0">
+                    {/* Approval Warning */}
+                    {!user?.is_approved && (
+                        <div className="mb-6 p-4 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg">
+                            <p className="text-yellow-800 dark:text-yellow-200">
+                                ⚠️ Your account is pending admin approval. Some features may be restricted.
+                            </p>
+                        </div>
+                    )}
+
+                    {/* Welcome Section */}
+                    <div className="mb-8">
+                        <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
+                            Welcome back, {user?.username}!
+                        </h1>
+                        <p className="text-gray-600 dark:text-gray-400">
+                            Choose an option from the sidebar to get started.
                         </p>
                     </div>
-                )}
 
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    <Link to="/chat" className="p-6 bg-white dark:bg-gray-800 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 hover:-translate-y-1">
-                        <div className="flex items-center gap-4">
-                            <div className="p-3 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
-                                <svg className="w-8 h-8 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-                                </svg>
-                            </div>
-                            <div>
-                                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Chat</h3>
-                                <p className="text-sm text-gray-500 dark:text-gray-400">Messages & Groups</p>
-                            </div>
+                    {/* Motivational Messages */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                        <div className="p-6 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl shadow-lg text-white">
+                            <h3 className="text-lg font-semibold mb-2">💬 Stay Connected</h3>
+                            <p className="text-blue-100">
+                                Connect with your friends and communities through our real-time chat system. Start a conversation today!
+                            </p>
                         </div>
-                    </Link>
 
-                    <Link to="/streaming" className="p-6 bg-white dark:bg-gray-800 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 hover:-translate-y-1">
-                        <div className="flex items-center gap-4">
-                            <div className="p-3 bg-purple-100 dark:bg-purple-900/30 rounded-lg">
-                                <svg className="w-8 h-8 text-purple-600 dark:text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
-                                </svg>
-                            </div>
-                            <div>
-                                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Streaming</h3>
-                                <p className="text-sm text-gray-500 dark:text-gray-400">Live Events</p>
-                            </div>
+                        <div className="p-6 bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl shadow-lg text-white">
+                            <h3 className="text-lg font-semibold mb-2">🎥 Go Live</h3>
+                            <p className="text-purple-100">
+                                Share your moments with the world. Upload or stream live content to engage with your audience.
+                            </p>
                         </div>
-                    </Link>
 
-                    <Link to="/profile" className="p-6 bg-white dark:bg-gray-800 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 hover:-translate-y-1">
-                        <div className="flex items-center gap-4">
-                            <div className="p-3 bg-green-100 dark:bg-green-900/30 rounded-lg">
-                                <svg className="w-8 h-8 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                                </svg>
-                            </div>
-                            <div>
-                                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Profile</h3>
-                                <p className="text-sm text-gray-500 dark:text-gray-400">Account Settings</p>
-                            </div>
+                        <div className="p-6 bg-gradient-to-br from-green-500 to-green-600 rounded-xl shadow-lg text-white">
+                            <h3 className="text-lg font-semibold mb-2">✨ Today's Thought</h3>
+                            <p className="text-green-100">
+                                "{['Success is not final, failure is not fatal: it is the courage to continue that counts.',
+                                    'The only way to do great work is to love what you do.',
+                                    'Believe you can and you\'re halfway there.',
+                                    'Your time is limited, don\'t waste it living someone else\'s life.',
+                                    'Innovation distinguishes between a leader and a follower.'][Math.floor(Math.random() * 5)]}"
+                            </p>
                         </div>
-                    </Link>
 
-                    {user?.role === 'ADMIN' && (
-                        <Link to="/admin" className="p-6 bg-white dark:bg-gray-800 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 hover:-translate-y-1">
-                            <div className="flex items-center gap-4">
-                                <div className="p-3 bg-red-100 dark:bg-red-900/30 rounded-lg">
-                                    <svg className="w-8 h-8 text-red-600 dark:text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                    </svg>
-                                </div>
-                                <div>
-                                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Admin Panel</h3>
-                                    <p className="text-sm text-gray-500 dark:text-gray-400">Manage Users & Content</p>
-                                </div>
-                            </div>
-                        </Link>
-                    )}
+                        <div className="p-6 bg-gradient-to-br from-orange-500 to-orange-600 rounded-xl shadow-lg text-white">
+                            <h3 className="text-lg font-semibold mb-2">🚀 Quick Tip</h3>
+                            <p className="text-orange-100">
+                                {user?.role === 'ADMIN'
+                                    ? 'Use the Admin Panel to manage users, streams, and chat rooms efficiently.'
+                                    : 'Explore groups to find communities that match your interests!'}
+                            </p>
+                        </div>
+                    </div>
+
+                    {/* Additional Info Section */}
+                    <div className="mt-8 p-6 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-xl">
+                        <h2 className="text-lg font-semibold text-blue-900 dark:text-blue-100 mb-2">
+                            Getting Started
+                        </h2>
+                        <ul className="space-y-2 text-sm text-blue-800 dark:text-blue-200">
+                            <li>• Use the sidebar to navigate between Chat, Streaming, and Profile sections</li>
+                            <li>• Click on sub-items to access specific features like Groups or Upload Stream</li>
+                            <li>• On mobile, tap the menu icon to open the sidebar</li>
+                            {user?.role === 'ADMIN' && <li>• Access the Admin Panel to manage users, streams, and chat rooms</li>}
+                        </ul>
+                    </div>
                 </div>
             </main>
         </div>

@@ -4,6 +4,7 @@ import { useAuthStore } from '../store/authStore';
 import api from '../lib/api';
 import Modal from '../components/Modal';
 import ManageMembersModal from '../components/ManageMembersModal';
+import BackButton from '../components/BackButton';
 import { Trash2, Edit, Users } from 'lucide-react';
 
 interface User {
@@ -218,9 +219,7 @@ export default function AdminPanel() {
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
                     <div className="flex justify-between items-center">
                         <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Admin Panel</h1>
-                        <Link to="/dashboard" className="text-blue-600 dark:text-blue-400 hover:underline">
-                            ← Back to Dashboard
-                        </Link>
+                        <BackButton label="Dashboard" />
                     </div>
                 </div>
             </header>
@@ -432,7 +431,7 @@ export default function AdminPanel() {
                                     <tr>
                                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Name</th>
                                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Type</th>
-                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Access</th>
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Price</th>
                                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Actions</th>
                                     </tr>
                                 </thead>
@@ -440,13 +439,16 @@ export default function AdminPanel() {
                                     {rooms.map((room) => (
                                         <tr key={room.id}>
                                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">{room.name}</td>
-                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">{room.type}</td>
                                             <td className="px-6 py-4 whitespace-nowrap text-sm">
-                                                {room.is_paid ? (
-                                                    <span className="px-2 py-1 text-xs bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200 rounded">Paid</span>
-                                                ) : (
-                                                    <span className="px-2 py-1 text-xs bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200 rounded">Free</span>
-                                                )}
+                                                <span className={`px-2 py-1 text-xs rounded ${room.type === 'GROUP'
+                                                    ? 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200'
+                                                    : 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200'
+                                                    }`}>
+                                                    {room.type}
+                                                </span>
+                                            </td>
+                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                                                {room.is_paid ? 'Paid' : 'Free'}
                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap text-sm">
                                                 <div className="flex gap-2">
@@ -477,8 +479,12 @@ export default function AdminPanel() {
                 )}
             </main>
 
-            {/* Edit User Modal */}
-            <Modal isOpen={!!editingUser} onClose={() => setEditingUser(null)} title="Edit User">
+            {/* Modals */}
+            <Modal
+                isOpen={!!editingUser}
+                onClose={() => setEditingUser(null)}
+                title="Edit User"
+            >
                 {editingUser && (
                     <div className="space-y-4">
                         <div>
@@ -487,7 +493,7 @@ export default function AdminPanel() {
                                 type="text"
                                 value={editingUser.username}
                                 onChange={(e) => setEditingUser({ ...editingUser, username: e.target.value })}
-                                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                                className="w-full px-3 py-2 border rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white"
                             />
                         </div>
                         <div>
@@ -496,7 +502,7 @@ export default function AdminPanel() {
                                 type="email"
                                 value={editingUser.email}
                                 onChange={(e) => setEditingUser({ ...editingUser, email: e.target.value })}
-                                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                                className="w-full px-3 py-2 border rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white"
                             />
                         </div>
                         <div>
@@ -504,7 +510,7 @@ export default function AdminPanel() {
                             <select
                                 value={editingUser.role}
                                 onChange={(e) => setEditingUser({ ...editingUser, role: e.target.value })}
-                                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                                className="w-full px-3 py-2 border rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white"
                             >
                                 <option value="FREE">Free</option>
                                 <option value="PAID">Paid</option>
@@ -512,18 +518,33 @@ export default function AdminPanel() {
                                 <option value="ADMIN">Admin</option>
                             </select>
                         </div>
-                        <button
-                            onClick={() => updateUser(editingUser.id, editingUser)}
-                            className="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
-                        >
-                            Save Changes
-                        </button>
+                        <div className="flex justify-end gap-3 mt-6">
+                            <button
+                                onClick={() => setEditingUser(null)}
+                                className="px-4 py-2 text-gray-600 hover:text-gray-800 dark:text-gray-400"
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                onClick={() => updateUser(editingUser.id, {
+                                    username: editingUser.username,
+                                    email: editingUser.email,
+                                    role: editingUser.role
+                                })}
+                                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                            >
+                                Save Changes
+                            </button>
+                        </div>
                     </div>
                 )}
             </Modal>
 
-            {/* Edit Stream Modal */}
-            <Modal isOpen={!!editingStream} onClose={() => setEditingStream(null)} title="Edit Stream">
+            <Modal
+                isOpen={!!editingStream}
+                onClose={() => setEditingStream(null)}
+                title="Edit Stream"
+            >
                 {editingStream && (
                     <div className="space-y-4">
                         <div>
@@ -532,7 +553,7 @@ export default function AdminPanel() {
                                 type="text"
                                 value={editingStream.title}
                                 onChange={(e) => setEditingStream({ ...editingStream, title: e.target.value })}
-                                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                                className="w-full px-3 py-2 border rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white"
                             />
                         </div>
                         <div className="flex items-center gap-2">
@@ -540,7 +561,7 @@ export default function AdminPanel() {
                                 type="checkbox"
                                 checked={editingStream.is_paid}
                                 onChange={(e) => setEditingStream({ ...editingStream, is_paid: e.target.checked })}
-                                className="w-4 h-4"
+                                className="rounded border-gray-300"
                             />
                             <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Paid Stream</label>
                         </div>
@@ -549,24 +570,40 @@ export default function AdminPanel() {
                                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Price</label>
                                 <input
                                     type="number"
+                                    step="0.01"
                                     value={editingStream.price}
                                     onChange={(e) => setEditingStream({ ...editingStream, price: e.target.value })}
-                                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                                    className="w-full px-3 py-2 border rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white"
                                 />
                             </div>
                         )}
-                        <button
-                            onClick={() => updateStream(editingStream.id, editingStream)}
-                            className="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
-                        >
-                            Save Changes
-                        </button>
+                        <div className="flex justify-end gap-3 mt-6">
+                            <button
+                                onClick={() => setEditingStream(null)}
+                                className="px-4 py-2 text-gray-600 hover:text-gray-800 dark:text-gray-400"
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                onClick={() => updateStream(editingStream.id, {
+                                    title: editingStream.title,
+                                    is_paid: editingStream.is_paid,
+                                    price: editingStream.price
+                                })}
+                                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                            >
+                                Save Changes
+                            </button>
+                        </div>
                     </div>
                 )}
             </Modal>
 
-            {/* Create Group Modal */}
-            <Modal isOpen={isCreateGroupOpen} onClose={() => setIsCreateGroupOpen(false)} title="Create Group">
+            <Modal
+                isOpen={isCreateGroupOpen}
+                onClose={() => setIsCreateGroupOpen(false)}
+                title="Create Group"
+            >
                 <div className="space-y-4">
                     <div>
                         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Group Name</label>
@@ -574,7 +611,7 @@ export default function AdminPanel() {
                             type="text"
                             value={groupName}
                             onChange={(e) => setGroupName(e.target.value)}
-                            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                            className="w-full px-3 py-2 border rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white"
                             placeholder="Enter group name"
                         />
                     </div>
@@ -583,7 +620,7 @@ export default function AdminPanel() {
                             type="checkbox"
                             checked={groupIsPaid}
                             onChange={(e) => setGroupIsPaid(e.target.checked)}
-                            className="w-4 h-4"
+                            className="rounded border-gray-300"
                         />
                         <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Paid Group</label>
                     </div>
@@ -592,23 +629,31 @@ export default function AdminPanel() {
                             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Price</label>
                             <input
                                 type="number"
+                                step="0.01"
                                 value={groupPrice}
                                 onChange={(e) => setGroupPrice(e.target.value)}
-                                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                                className="w-full px-3 py-2 border rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white"
                                 placeholder="0.00"
                             />
                         </div>
                     )}
-                    <button
-                        onClick={createGroup}
-                        className="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
-                    >
-                        Create Group
-                    </button>
+                    <div className="flex justify-end gap-3 mt-6">
+                        <button
+                            onClick={() => setIsCreateGroupOpen(false)}
+                            className="px-4 py-2 text-gray-600 hover:text-gray-800 dark:text-gray-400"
+                        >
+                            Cancel
+                        </button>
+                        <button
+                            onClick={createGroup}
+                            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                        >
+                            Create Group
+                        </button>
+                    </div>
                 </div>
             </Modal>
 
-            {/* Manage Members Modal */}
             {managingRoom && (
                 <ManageMembersModal
                     isOpen={!!managingRoom}

@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../store/authStore';
 import { useThemeStore } from '../store/themeStore';
 import api from '../lib/api';
+import BackButton from '../components/BackButton';
 
 export default function Profile() {
     const { user, logout } = useAuthStore();
@@ -52,9 +53,7 @@ export default function Profile() {
                         >
                             {theme === 'light' ? '🌙' : '☀️'}
                         </button>
-                        <Link to="/dashboard" className="text-blue-600 dark:text-blue-400 hover:underline">
-                            Dashboard
-                        </Link>
+                        <BackButton label="Dashboard" />
                         <button
                             onClick={handleLogout}
                             className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors"
@@ -142,8 +141,8 @@ export default function Profile() {
                                             Account Status
                                         </label>
                                         <span className={`inline-block px-3 py-1 rounded-full text-sm font-medium ${user?.is_approved
-                                                ? 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-200'
-                                                : 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-200'
+                                            ? 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-200'
+                                            : 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-200'
                                             }`}>
                                             {user?.is_approved ? '✅ Approved' : '⏳ Pending Approval'}
                                         </span>

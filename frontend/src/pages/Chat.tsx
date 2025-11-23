@@ -2,7 +2,8 @@ import { useState, useEffect, useRef } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../store/authStore';
 import api from '../lib/api';
-import EmojiPicker, { type EmojiClickData } from 'emoji-picker-react';
+import BackButton from '../components/BackButton';
+import EmojiPicker, { type EmojiClickData, Theme } from 'emoji-picker-react';
 import {
     Search,
     MoreVertical,
@@ -15,9 +16,7 @@ import {
     ArrowLeft,
     MessageSquarePlus,
     Check,
-    CheckCheck,
-    Menu,
-    X
+    CheckCheck
 } from 'lucide-react';
 
 interface ReactionGroup {
@@ -72,8 +71,6 @@ export default function Chat() {
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const [isMobileView, setIsMobileView] = useState(window.innerWidth < 768);
 
-    const QUICK_EMOJIS = ['👍', '❤️', '😂', '😮', '🎉'];
-
     // Handle window resize for responsive layout
     useEffect(() => {
         const handleResize = () => setIsMobileView(window.innerWidth < 768);
@@ -118,6 +115,7 @@ export default function Chat() {
                     content: data.message,
                     sender: { id: data.user_id, username: data.username || 'User' },
                     timestamp: new Date().toISOString(),
+                    is_read: false,
                 }]);
                 // Refresh room list to update last message preview (optional optimization: update locally)
                 fetchRooms();
@@ -147,85 +145,20 @@ export default function Chat() {
 
     const sendMessage = () => {
         if (!newMessage.trim() || !ws || !user) return;
-        ws.send(JSON.stringify({ message: newMessage, user_id: user.id, username: user.username }));
+        ws.send(JSON.stringify({ message: newMessage }));
         setNewMessage('');
     };
 
-    const handleReaction = async (messageId: number, emoji: string, isRemoving: boolean) => {
-        if (!roomId || !user) return;
-
-        setShowEmojiPicker(null);
-
-        setMessages(prev => prev.map(msg => {
-            if (msg.id !== messageId) return msg;
-            let reactions = msg.reactions || [];
-
-            if (!isRemoving) {
-                reactions = reactions.map(r => ({
-                    ...r,
-                    count: r.user_reacted ? r.count - 1 : r.count,
-                    user_reacted: false,
-                    users: r.users.filter(u => u.id !== user.id)
-                })).filter(r => r.count > 0);
-            }
-
-            const existingIdx = reactions.findIndex(r => r.emoji === emoji);
-
-            if (isRemoving) {
-                if (existingIdx >= 0) {
-                    const updated = [...reactions];
-                    updated[existingIdx] = {
-                        ...updated[existingIdx],
-                        count: updated[existingIdx].count - 1,
-                        user_reacted: false,
-                        users: updated[existingIdx].users.filter(u => u.id !== user.id)
-                    };
-                    return { ...msg, reactions: updated.filter(r => r.count > 0) };
-                }
-            } else {
-                if (existingIdx >= 0) {
-                    const updated = [...reactions];
-                    updated[existingIdx] = {
-                        ...updated[existingIdx],
-                        count: updated[existingIdx].count + 1,
-                        user_reacted: true,
-                        users: [...updated[existingIdx].users, { id: user.id, username: user.username }]
-                    };
-                    return { ...msg, reactions: updated };
-                } else {
-                    return {
-                        ...msg,
-                        reactions: [...reactions, {
-                            emoji,
-                            count: 1,
-                            user_reacted: true,
-                            users: [{ id: user.id, username: user.username }]
-                        }]
-                    };
-                }
-            }
-            return msg;
-        }));
-
+    const handleReaction = async (messageId: number, emoji: string, userReacted: boolean) => {
         try {
-            const method = isRemoving ? 'delete' : 'post';
-            await api({ method, url: `/chat/rooms/${roomId}/messages/${messageId}/react/`, data: { emoji } });
-
-            if (ws && ws.readyState === WebSocket.OPEN) {
-                ws.send(JSON.stringify({
-                    type: 'reaction_update',
-                    message_id: messageId,
-                    emoji,
-                    user_id: user.id,
-                    action: isRemoving ? 'remove' : 'add'
-                }));
+            if (userReacted) {
+                await api.delete(`/chat/messages/${messageId}/reaction/`);
+            } else {
+                await api.post(`/chat/messages/${messageId}/reaction/`, { emoji });
             }
-
-            const response = await api.get(`/chat/rooms/${roomId}/messages/`);
-            setMessages(response.data);
+            setShowEmojiPicker(null);
         } catch (error) {
-            console.error('Error reacting:', error);
-            api.get(`/chat/rooms/${roomId}/messages/`).then((res) => setMessages(res.data)).catch(console.error);
+            console.error('Error updating reaction:', error);
         }
     };
 
@@ -255,6 +188,12 @@ export default function Chat() {
                 {/* Sidebar Header */}
                 <div className="h-[60px] px-4 bg-[#202c33] flex items-center justify-between shrink-0">
                     <div className="flex items-center gap-3">
+                        <div className="md:hidden">
+                            <BackButton label="" />
+                        </div>
+                        <div className="hidden md:block">
+                            <BackButton label="Back" />
+                        </div>
                         <div className="w-10 h-10 rounded-full bg-gray-600 flex items-center justify-center overflow-hidden">
                             {/* User Avatar Placeholder */}
                             <span className="text-lg font-medium text-white">{user?.username?.[0]?.toUpperCase()}</span>
@@ -438,7 +377,7 @@ export default function Chat() {
                                                         onEmojiClick={(emojiData: EmojiClickData) => {
                                                             handleReaction(msg.id, emojiData.emoji, false);
                                                         }}
-                                                        theme="dark"
+                                                        theme={Theme.DARK}
                                                         width={300}
                                                         height={350}
                                                         searchPlaceHolder="Search emoji..."
