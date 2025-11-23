@@ -143,3 +143,51 @@ class ChatRoomViewSet(viewsets.ModelViewSet):
         
         serializer = self.get_serializer(room)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+class AdminChatRoomViewSet(viewsets.ModelViewSet):
+    queryset = ChatRoom.objects.all()
+    serializer_class = ChatRoomSerializer
+    permission_classes = [permissions.IsAuthenticated, IsAdmin]
+    
+    @action(detail=True, methods=['get'])
+    def members(self, request, pk=None):
+        """List all members of a chat room"""
+        room = self.get_object()
+        from users.serializers import UserSerializer
+        members = room.members.all()
+        serializer = UserSerializer(members, many=True)
+        return Response(serializer.data)
+    
+    @action(detail=True, methods=['post'])
+    def add_member(self, request, pk=None):
+        """Add a member to a chat room"""
+        room = self.get_object()
+        user_id = request.data.get('user_id')
+        
+        if not user_id:
+            return Response({'error': 'user_id required'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        try:
+            from users.models import User
+            user = User.objects.get(id=user_id)
+            room.members.add(user)
+            return Response({'status': 'member added'}, status=status.HTTP_200_OK)
+        except User.DoesNotExist:
+            return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
+    
+    @action(detail=True, methods=['post'])
+    def remove_member(self, request, pk=None):
+        """Remove a member from a chat room"""
+        room = self.get_object()
+        user_id = request.data.get('user_id')
+        
+        if not user_id:
+            return Response({'error': 'user_id required'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        try:
+            from users.models import User
+            user = User.objects.get(id=user_id)
+            room.members.remove(user)
+            return Response({'status': 'member removed'}, status=status.HTTP_200_OK)
+        except User.DoesNotExist:
+            return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)

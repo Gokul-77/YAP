@@ -29,3 +29,37 @@ class UserListView(generics.ListAPIView):
     def get_queryset(self):
         # Exclude the current user from the list
         return User.objects.filter(is_approved=True).exclude(id=self.request.user.id)
+
+from rest_framework import viewsets
+from rest_framework.decorators import action
+from .serializers import AdminUserSerializer
+from .permissions import IsAdmin
+
+class AdminUserViewSet(viewsets.ModelViewSet):
+    queryset = User.objects.all()
+    serializer_class = AdminUserSerializer
+    permission_classes = [permissions.IsAuthenticated, IsAdmin]
+    
+    @action(detail=True, methods=['post'])
+    def suspend(self, request, pk=None):
+        """Suspend a user"""
+        user = self.get_object()
+        user.status = User.Status.SUSPENDED
+        user.save()
+        return Response({'status': 'user suspended'}, status=status.HTTP_200_OK)
+    
+    @action(detail=True, methods=['post'])
+    def reject(self, request, pk=None):
+        """Reject a user"""
+        user = self.get_object()
+        user.status = User.Status.REJECTED
+        user.save()
+        return Response({'status': 'user rejected'}, status=status.HTTP_200_OK)
+    
+    @action(detail=True, methods=['post'])
+    def activate(self, request, pk=None):
+        """Activate a user"""
+        user = self.get_object()
+        user.status = User.Status.ACTIVE
+        user.save()
+        return Response({'status': 'user activated'}, status=status.HTTP_200_OK)

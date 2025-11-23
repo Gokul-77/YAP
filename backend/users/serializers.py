@@ -6,8 +6,8 @@ User = get_user_model()
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ('id', 'username', 'email', 'role', 'is_approved')
-        read_only_fields = ('role', 'is_approved')
+        fields = ('id', 'username', 'email', 'role', 'status', 'is_approved')
+        read_only_fields = ('role', 'status', 'is_approved')
 
 class RegisterSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True)
@@ -21,6 +21,11 @@ class RegisterSerializer(serializers.ModelSerializer):
             username=validated_data['username'],
             email=validated_data['email'],
             password=validated_data['password'],
-            is_approved=False  # Pending approval by default
+            status=User.Status.PENDING  # Pending approval by default
         )
         return user
+
+class AdminUserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ('id', 'username', 'email', 'role', 'status', 'is_approved')
