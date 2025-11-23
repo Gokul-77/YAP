@@ -63,3 +63,35 @@ class AdminUserViewSet(viewsets.ModelViewSet):
         user.status = User.Status.ACTIVE
         user.save()
         return Response({'status': 'user activated'}, status=status.HTTP_200_OK)
+
+from django.utils import timezone
+from django.db.models import Q
+from chat.models import Message
+from streaming.models import StreamEvent
+
+class DashboardStatsView(generics.RetrieveAPIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request, *args, **kwargs):
+        today = timezone.now().date()
+        
+        # Online Users (Using total approved users for now as proxy)
+        online_users = User.objects.filter(is_approved=True).count()
+
+        # Messages Today
+        messages_today = Message.objects.filter(timestamp__date=today).count()
+
+        # Active Streams
+        now = timezone.now()
+        active_streams = StreamEvent.objects.filter(
+            start_time__lte=now
+        ).filter(
+            Q(end_time__isnull=True) | Q(end_time__gte=now)
+        ).count()
+
+        return Response({
+            'online_users': online_users,
+            'messages_today': messages_today,
+            'active_streams': active_streams,
+            'system_health': 'Operational'
+        })

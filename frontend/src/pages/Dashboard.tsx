@@ -1,21 +1,50 @@
 import { useNavigate } from 'react-router-dom';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useAuthStore } from '../store/authStore';
 import { useThemeStore } from '../store/themeStore';
 import Sidebar from '../components/Sidebar';
-import { Menu } from 'lucide-react';
+import WelcomeSection from '../components/dashboard/WelcomeSection';
+import StatsWidget from '../components/dashboard/StatsWidget';
+import GettingStartedPanel from '../components/dashboard/GettingStartedPanel';
+import { Menu, Users, MessageSquare, Video, Activity } from 'lucide-react';
+import api from '../lib/api';
+
+interface DashboardStats {
+    online_users: number;
+    messages_today: number;
+    active_streams: number;
+    system_health: string;
+}
 
 export default function Dashboard() {
-    const { user, logout } = useAuthStore();
+    const { user } = useAuthStore();
     const { theme, toggleTheme } = useThemeStore();
     const navigate = useNavigate();
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const [currentView, setCurrentView] = useState<string>('/dashboard');
+    const [stats, setStats] = useState<DashboardStats>({
+        online_users: 0,
+        messages_today: 0,
+        active_streams: 0,
+        system_health: 'Checking...',
+    });
 
-    const handleLogout = () => {
-        logout();
-        navigate('/login');
-    };
+    useEffect(() => {
+        const fetchStats = async () => {
+            try {
+                const response = await api.get('/users/dashboard-stats/');
+                setStats(response.data);
+            } catch (error) {
+                console.error('Failed to fetch dashboard stats:', error);
+                setStats(prev => ({ ...prev, system_health: 'Error' }));
+            }
+        };
+
+        fetchStats();
+        // Poll every 30 seconds for real-time updates
+        const interval = setInterval(fetchStats, 30000);
+        return () => clearInterval(interval);
+    }, []);
 
     const handleNavigation = (path: string) => {
         setCurrentView(path);
@@ -68,64 +97,48 @@ export default function Dashboard() {
                     )}
 
                     {/* Welcome Section */}
-                    <div className="mb-8">
-                        <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
-                            Welcome back, {user?.username}!
-                        </h1>
-                        <p className="text-gray-600 dark:text-gray-400">
-                            Choose an option from the sidebar to get started.
-                        </p>
+                    <WelcomeSection username={user?.username || 'User'} />
+
+                    {/* Real-Time Stats Row */}
+                    <div className="mt-8 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+                        <StatsWidget
+                            icon={<Users size={24} />}
+                            label="Online Users"
+                            value={stats.online_users.toLocaleString()}
+                            subtext="Active community members"
+                            color="blue"
+                            animate={true}
+                            delay={100}
+                        />
+                        <StatsWidget
+                            icon={<MessageSquare size={24} />}
+                            label="Messages Today"
+                            value={stats.messages_today.toLocaleString()}
+                            subtext="Conversations happening"
+                            color="green"
+                            delay={200}
+                        />
+                        <StatsWidget
+                            icon={<Video size={24} />}
+                            label="Active Streams"
+                            value={stats.active_streams}
+                            subtext="Live right now"
+                            color="purple"
+                            animate={stats.active_streams > 0}
+                            delay={300}
+                        />
+                        <StatsWidget
+                            icon={<Activity size={24} />}
+                            label="System Health"
+                            value={stats.system_health}
+                            subtext="All systems operational"
+                            color={stats.system_health === 'Error' ? 'red' : 'green'}
+                            delay={400}
+                        />
                     </div>
 
-                    {/* Motivational Messages */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-                        <div className="p-6 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl shadow-lg text-white">
-                            <h3 className="text-lg font-semibold mb-2">💬 Stay Connected</h3>
-                            <p className="text-blue-100">
-                                Connect with your friends and communities through our real-time chat system. Start a conversation today!
-                            </p>
-                        </div>
-
-                        <div className="p-6 bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl shadow-lg text-white">
-                            <h3 className="text-lg font-semibold mb-2">🎥 Go Live</h3>
-                            <p className="text-purple-100">
-                                Share your moments with the world. Upload or stream live content to engage with your audience.
-                            </p>
-                        </div>
-
-                        <div className="p-6 bg-gradient-to-br from-green-500 to-green-600 rounded-xl shadow-lg text-white">
-                            <h3 className="text-lg font-semibold mb-2">✨ Today's Thought</h3>
-                            <p className="text-green-100">
-                                "{['Success is not final, failure is not fatal: it is the courage to continue that counts.',
-                                    'The only way to do great work is to love what you do.',
-                                    'Believe you can and you\'re halfway there.',
-                                    'Your time is limited, don\'t waste it living someone else\'s life.',
-                                    'Innovation distinguishes between a leader and a follower.'][Math.floor(Math.random() * 5)]}"
-                            </p>
-                        </div>
-
-                        <div className="p-6 bg-gradient-to-br from-orange-500 to-orange-600 rounded-xl shadow-lg text-white">
-                            <h3 className="text-lg font-semibold mb-2">🚀 Quick Tip</h3>
-                            <p className="text-orange-100">
-                                {user?.role === 'ADMIN'
-                                    ? 'Use the Admin Panel to manage users, streams, and chat rooms efficiently.'
-                                    : 'Explore groups to find communities that match your interests!'}
-                            </p>
-                        </div>
-                    </div>
-
-                    {/* Additional Info Section */}
-                    <div className="mt-8 p-6 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-xl">
-                        <h2 className="text-lg font-semibold text-blue-900 dark:text-blue-100 mb-2">
-                            Getting Started
-                        </h2>
-                        <ul className="space-y-2 text-sm text-blue-800 dark:text-blue-200">
-                            <li>• Use the sidebar to navigate between Chat, Streaming, and Profile sections</li>
-                            <li>• Click on sub-items to access specific features like Groups or Upload Stream</li>
-                            <li>• On mobile, tap the menu icon to open the sidebar</li>
-                            {user?.role === 'ADMIN' && <li>• Access the Admin Panel to manage users, streams, and chat rooms</li>}
-                        </ul>
-                    </div>
+                    {/* Getting Started Panel */}
+                    <GettingStartedPanel />
                 </div>
             </main>
         </div>
