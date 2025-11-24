@@ -78,13 +78,13 @@ export default function Profile() {
                 <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden">
                     <div className="bg-gradient-to-r from-blue-600 to-purple-600 h-32"></div>
                     <div className="px-6 pb-6">
-                        <div className="flex items-end -mt-16 mb-6">
-                            <div className="w-32 h-32 rounded-full bg-white dark:bg-gray-700 border-4 border-white dark:border-gray-800 flex items-center justify-center">
+                        <div className="flex flex-col md:flex-row items-center md:items-end -mt-16 mb-6">
+                            <div className="w-32 h-32 rounded-full bg-white dark:bg-gray-700 border-4 border-white dark:border-gray-800 flex items-center justify-center shrink-0">
                                 <svg className="w-20 h-20 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
                                     <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
                                 </svg>
                             </div>
-                            <div className="ml-4 mb-2">
+                            <div className="mt-4 md:mt-0 md:ml-4 mb-2 text-center md:text-left">
                                 <h2 className="text-2xl font-bold text-gray-900 dark:text-white">{user?.username}</h2>
                                 <p className="text-gray-600 dark:text-gray-400">{user?.email}</p>
                             </div>

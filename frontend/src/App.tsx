@@ -15,13 +15,25 @@ import CreateGroup from './pages/CreateGroup';
 import './index.css';
 
 function App() {
-  const { isAuthenticated, fetchUser } = useAuthStore();
+  const { isAuthenticated, isLoading, fetchUser } = useAuthStore();
   const { theme } = useThemeStore();
 
   useEffect(() => {
     fetchUser();
     document.documentElement.classList.toggle('dark', theme === 'dark');
   }, [fetchUser, theme]);
+
+  // Show loading while checking authentication
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center h-screen bg-gradient-to-br from-[#0a0e12] to-[#121820]">
+        <div className="text-center">
+          <div className="w-16 h-16 mx-auto mb-4 border-4 border-[#8b5cf6] border-t-transparent rounded-full animate-spin"></div>
+          <p className="text-[#e9edef] text-lg">Loading...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <Router>

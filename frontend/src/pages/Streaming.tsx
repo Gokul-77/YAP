@@ -41,20 +41,15 @@ export default function Streaming() {
         <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
             <header className="bg-white dark:bg-gray-800 shadow-sm">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-                    <div className="flex justify-between items-center">
-                        import BackButton from '../components/BackButton';
-
-                        // ... (imports)
-
-                        // ... (inside component)
+                    <div className="flex flex-col md:flex-row justify-between items-center gap-4">
                         <div>
                             <div className="mb-2">
-                                <BackButton />
+                                <BackButton label="Dashboard" />
                             </div>
                             <h1 className="text-2xl font-bold text-gray-900 dark:text-white mt-2">Live Streaming</h1>
                         </div>
                         {user?.role === 'ADMIN' && (
-                            <Link to="/streaming/create" className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors">
+                            <Link to="/streaming/create" className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors w-full md:w-auto text-center">
                                 + Create Stream
                             </Link>
                         )}

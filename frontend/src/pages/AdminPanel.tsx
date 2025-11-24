@@ -226,7 +226,7 @@ export default function AdminPanel() {
 
             <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
                 {/* Tabs */}
-                <div className="flex gap-4 mb-6 border-b border-gray-200 dark:border-gray-700">
+                <div className="flex gap-4 mb-6 border-b border-gray-200 dark:border-gray-700 overflow-x-auto pb-1">
                     <button
                         onClick={() => setActiveTab('users')}
                         className={`px-4 py-2 font-medium ${activeTab === 'users'
@@ -258,7 +258,7 @@ export default function AdminPanel() {
 
                 {/* Users Tab */}
                 {activeTab === 'users' && (
-                    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden">
+                    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden overflow-x-auto">
                         <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
                             <thead className="bg-gray-50 dark:bg-gray-700">
                                 <tr>
@@ -366,7 +366,7 @@ export default function AdminPanel() {
                         >
                             + Create Stream
                         </Link>
-                        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden">
+                        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden overflow-x-auto">
                             <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
                                 <thead className="bg-gray-50 dark:bg-gray-700">
                                     <tr>
@@ -425,7 +425,7 @@ export default function AdminPanel() {
                         >
                             + Create Group
                         </button>
-                        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden">
+                        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden overflow-x-auto">
                             <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
                                 <thead className="bg-gray-50 dark:bg-gray-700">
                                     <tr>
