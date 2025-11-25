@@ -3,8 +3,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { useAuthStore } from './store/authStore';
 import { useThemeStore } from './store/themeStore';
 import Landing from './pages/Landing';
-import Login from './pages/Login';
-import Register from './pages/Register';
+
 import Dashboard from './pages/Dashboard';
 import Profile from './pages/Profile';
 import Chat from './pages/Chat';
@@ -39,8 +38,7 @@ function App() {
     <Router>
       <Routes>
         <Route path="/" element={<Landing />} />
-        <Route path="/login" element={!isAuthenticated ? <Login /> : <Navigate to="/dashboard" />} />
-        <Route path="/register" element={!isAuthenticated ? <Register /> : <Navigate to="/dashboard" />} />
+
         <Route path="/dashboard" element={isAuthenticated ? <Dashboard /> : <Navigate to="/login" />} />
         <Route path="/profile" element={isAuthenticated ? <Profile /> : <Navigate to="/login" />} />
         <Route path="/admin" element={isAuthenticated ? <AdminPanel /> : <Navigate to="/login" />} />
