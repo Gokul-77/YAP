@@ -19,7 +19,6 @@ interface MessageProps {
 }
 
 export default function Message({
-    id,
     content,
     sender,
     timestamp,
@@ -55,7 +54,7 @@ export default function Message({
 
     return (
         <div
-            className={`flex ${isMe ? 'justify-end' : 'justify-start'} mb-6 message-enter`}
+            className={`flex ${isMe ? 'justify-end' : 'justify-start'} mb-8 message-enter px-1`}
             onMouseEnter={() => setIsHovered(true)}
             onMouseLeave={() => setIsHovered(false)}
         >
@@ -116,7 +115,7 @@ export default function Message({
 
                 {/* Reactions Display */}
                 {reactions.length > 0 && (
-                    <div className="absolute -bottom-4 left-4 flex gap-1 z-10">
+                    <div className={`absolute -bottom-6 ${isMe ? 'right-10' : 'left-2'} flex gap-1.5 z-20`}>
                         {reactions.map((reaction, idx) => (
                             <ReactionBadge
                                 key={`${reaction.emoji}-${idx}`}

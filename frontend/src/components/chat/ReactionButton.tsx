@@ -16,7 +16,7 @@ export default function ReactionButton({ onClick, isVisible, isMobile }: Reactio
                 e.stopPropagation();
                 onClick();
             }}
-            className={`absolute bottom-0 right-0 translate-y-1/2 translate-x-1/4 w-6 h-6 rounded-full bg-[#6b7280] hover:bg-[var(--cosmic-purple)] text-white flex items-center justify-center shadow-lg transition-all duration-300 spring-scale z-20 ${shouldShow ? 'opacity-100 scale-100' : 'opacity-0 scale-0'
+            className={`absolute bottom-0 right-0 translate-y-1/2 translate-x-1/4 w-6 h-6 rounded-full bg-[#6b7280] hover:bg-[var(--cosmic-purple)] text-white flex items-center justify-center shadow-lg transition-all duration-300 spring-scale z-30 ${shouldShow ? 'opacity-100 scale-100' : 'opacity-0 scale-0'
                 }`}
             aria-label="Add reaction"
         >

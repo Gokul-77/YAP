@@ -81,6 +81,15 @@ export default function Chat() {
         return () => window.removeEventListener('resize', handleResize);
     }, []);
 
+    // Close sidebar on mobile when chat is selected
+    useEffect(() => {
+        if (isMobileView && roomId) {
+            setSidebarOpen(false);
+        } else if (!roomId) {
+            setSidebarOpen(true);
+        }
+    }, [roomId, isMobileView]);
+
     // Fetch rooms and users
     useEffect(() => {
         fetchRooms();
@@ -409,10 +418,14 @@ export default function Chat() {
     const chatAreaContent = roomId ? (
         <div className="flex flex-col h-full">
             {/* Chat Header */}
-            <div className="frosted-glass h-16 px-6 flex items-center justify-between shrink-0 border-b border-white/5">
-                <div className="flex items-center gap-4">
+            <div className="frosted-glass h-16 px-4 sm:px-6 flex items-center justify-between shrink-0 border-b border-white/5">
+                <div className="flex items-center gap-3 sm:gap-4">
                     {isMobileView && (
-                        <button onClick={() => navigate('/chat')} className="text-[#8696a0] hover:text-[var(--cosmic-purple)] spring-scale">
+                        <button
+                            onClick={() => navigate('/chat')}
+                            className="text-[#8696a0] hover:text-white active:text-[var(--cosmic-purple)] spring-scale touch-target p-2 -ml-2"
+                            aria-label="Back to chats"
+                        >
                             <ArrowLeft size={24} />
                         </button>
                     )}
@@ -420,7 +433,7 @@ export default function Chat() {
                         {(currentRoom?.display_name || currentRoom?.name || '?')[0].toUpperCase()}
                     </div>
                     <div className="flex flex-col">
-                        <h2 className="text-[#e9edef] font-bold text-lg">{currentRoom?.display_name || currentRoom?.name}</h2>
+                        <h2 className="text-[#e9edef] font-bold text-base sm:text-lg">{currentRoom?.display_name || currentRoom?.name}</h2>
                         <p className="text-xs text-[var(--cosmic-purple)]">Click for info</p>
                     </div>
                 </div>
@@ -439,7 +452,7 @@ export default function Chat() {
             </div>
 
             {/* Messages Area */}
-            <div className="flex-1 overflow-y-auto px-6 py-6 momentum-scroll">
+            <div className="flex-1 overflow-y-auto px-6 sm:px-10 py-6 pb-8 momentum-scroll">
                 {isLoading ? (
                     <SkeletonLoader />
                 ) : (
@@ -490,7 +503,17 @@ export default function Chat() {
         </div>
     ) : (
         /* Empty State */
-        <div className="flex flex-col items-center justify-center h-full text-center px-10">
+        <div className="flex flex-col items-center justify-center h-full text-center px-10 relative">
+            {/* Back button for mobile in empty state */}
+            {isMobileView && (
+                <Link
+                    to="/dashboard"
+                    className="absolute top-4 left-4 text-[#8696a0] hover:text-white active:text-[var(--cosmic-purple)] spring-scale touch-target p-2"
+                    aria-label="Back to dashboard"
+                >
+                    <ArrowLeft size={24} />
+                </Link>
+            )}
             <div className="mb-6">
                 <div className="w-28 h-28 rounded-full holographic-gradient flex items-center justify-center shadow-2xl">
                     <MessageSquarePlus size={56} className="text-white" />
