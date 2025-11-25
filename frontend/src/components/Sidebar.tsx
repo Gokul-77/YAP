@@ -31,7 +31,7 @@ export default function Sidebar({ isOpen, onToggle, currentPath, onNavigate }: S
 
     const handleLogout = () => {
         logout();
-        navigate('/login');
+        navigate('/');
     };
 
     const handleNavigation = (path: string) => {
@@ -56,7 +56,7 @@ export default function Sidebar({ isOpen, onToggle, currentPath, onNavigate }: S
             <aside
                 className={`
                     fixed md:static top-0 left-0 h-screen
-                    bg-gray-800 border-r border-gray-700
+                    bg-black/20 backdrop-blur-xl border-r border-white/10
                     transition-all duration-300 z-50
                     flex flex-col
                     ${isOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}
@@ -64,12 +64,12 @@ export default function Sidebar({ isOpen, onToggle, currentPath, onNavigate }: S
                 `}
             >
                 {/* Header */}
-                <div className={`p-4 border-b border-gray-700 flex items-center ${isCollapsed ? 'justify-center' : 'justify-between'}`}>
+                <div className={`p-4 border-b border-white/10 flex items-center ${isCollapsed ? 'justify-center' : 'justify-between'}`}>
                     {!isCollapsed && (
-                        <h1 className="text-2xl font-bold text-blue-500">YAP</h1>
+                        <h1 className="text-2xl font-bold bg-gradient-to-r from-[var(--holographic-start)] to-[var(--holographic-end)] bg-clip-text text-transparent">YAP</h1>
                     )}
                     {isCollapsed && (
-                        <h1 className="text-xl font-bold text-blue-500">Y</h1>
+                        <h1 className="text-xl font-bold text-[var(--holographic-start)]">Y</h1>
                     )}
 
                     {/* Desktop Collapse Toggle */}
@@ -197,7 +197,7 @@ export default function Sidebar({ isOpen, onToggle, currentPath, onNavigate }: S
                 </nav>
 
                 {/* User Info & Logout */}
-                <div className="border-t border-gray-700 p-4">
+                <div className="border-t border-white/10 p-4">
                     {!isCollapsed ? (
                         <>
                             <div className="mb-3">
@@ -206,7 +206,7 @@ export default function Sidebar({ isOpen, onToggle, currentPath, onNavigate }: S
                             </div>
                             <button
                                 onClick={handleLogout}
-                                className="w-full flex items-center gap-2 px-3 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white rounded-lg transition-colors"
+                                className="w-full flex items-center gap-2 px-3 py-2 text-sm text-gray-400 hover:bg-white/10 hover:text-white rounded-lg transition-colors"
                             >
                                 <LogOut size={18} />
                                 <span>Logout</span>
@@ -215,7 +215,7 @@ export default function Sidebar({ isOpen, onToggle, currentPath, onNavigate }: S
                     ) : (
                         <button
                             onClick={handleLogout}
-                            className="w-full flex justify-center p-2 text-gray-300 hover:bg-gray-700 hover:text-white rounded-lg transition-colors"
+                            className="w-full flex justify-center p-2 text-gray-400 hover:bg-white/10 hover:text-white rounded-lg transition-colors"
                             title="Logout"
                         >
                             <LogOut size={20} />

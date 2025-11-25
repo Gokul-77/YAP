@@ -27,8 +27,8 @@ export default function SidebarItem({
                 transition-all duration-200 
                 ${indent ? 'pl-12' : ''}
                 ${isActive
-                    ? 'bg-blue-600/20 text-blue-400 border-l-4 border-blue-500'
-                    : 'text-gray-300 hover:bg-gray-700 hover:text-white border-l-4 border-transparent'
+                    ? 'bg-white/10 text-[var(--holographic-start)] border-l-4 border-[var(--holographic-start)]'
+                    : 'text-gray-400 hover:bg-white/5 hover:text-white border-l-4 border-transparent'
                 }
                 ${isCollapsed ? 'justify-center' : ''}
             `}

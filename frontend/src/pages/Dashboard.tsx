@@ -56,7 +56,7 @@ export default function Dashboard() {
     };
 
     return (
-        <div className="flex h-screen overflow-hidden bg-gray-50 dark:bg-gray-900">
+        <div className="flex h-screen overflow-hidden bg-[var(--deep-space)] text-white">
             {/* Mobile Menu Button */}
             <button
                 onClick={toggleSidebar}
@@ -74,71 +74,89 @@ export default function Dashboard() {
             />
 
             {/* Main Content Area */}
-            <main className="flex-1 overflow-auto">
+            <main className="flex-1 overflow-auto relative">
+                {/* Background Effects */}
+                <div className="absolute inset-0 overflow-hidden pointer-events-none">
+                    <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-purple-900/20 rounded-full blur-[120px] animate-pulse" />
+                    <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-blue-900/20 rounded-full blur-[120px] animate-pulse delay-1000" />
+                </div>
+
                 {/* Theme Toggle - Top Right */}
                 <div className="absolute top-4 right-4 z-20">
                     <button
                         onClick={toggleTheme}
-                        className="p-2 rounded-lg bg-white dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors shadow-md"
+                        className="p-2 rounded-lg bg-white/5 border border-white/10 hover:bg-white/10 transition-colors shadow-md backdrop-blur-sm"
                     >
                         {theme === 'light' ? '🌙' : '☀️'}
                     </button>
                 </div>
 
                 {/* Dashboard Content */}
-                <div className="p-6 md:p-8 mt-12 md:mt-0">
+                <div className="p-6 md:p-8 mt-12 md:mt-0 relative z-10">
                     {/* Approval Warning */}
                     {!user?.is_approved && (
-                        <div className="mb-6 p-4 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg">
-                            <p className="text-yellow-800 dark:text-yellow-200">
+                        <div className="mb-6 p-4 bg-yellow-500/10 border border-yellow-500/20 rounded-lg backdrop-blur-sm">
+                            <p className="text-yellow-200">
                                 ⚠️ Your account is pending admin approval. Some features may be restricted.
                             </p>
                         </div>
                     )}
 
                     {/* Welcome Section */}
-                    <WelcomeSection username={user?.username || 'User'} />
+                    <div className="animate-fade-in-up">
+                        <WelcomeSection username={user?.username || 'User'} />
+                    </div>
 
                     {/* Real-Time Stats Row */}
                     <div className="mt-8 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
-                        <StatsWidget
-                            icon={<Users size={24} />}
-                            label="Online Users"
-                            value={stats.online_users.toLocaleString()}
-                            subtext="Active community members"
-                            color="blue"
-                            animate={true}
-                            delay={100}
-                        />
-                        <StatsWidget
-                            icon={<MessageSquare size={24} />}
-                            label="Messages Today"
-                            value={stats.messages_today.toLocaleString()}
-                            subtext="Conversations happening"
-                            color="green"
-                            delay={200}
-                        />
-                        <StatsWidget
-                            icon={<Video size={24} />}
-                            label="Active Streams"
-                            value={stats.active_streams}
-                            subtext="Live right now"
-                            color="purple"
-                            animate={stats.active_streams > 0}
-                            delay={300}
-                        />
-                        <StatsWidget
-                            icon={<Activity size={24} />}
-                            label="System Health"
-                            value={stats.system_health}
-                            subtext="All systems operational"
-                            color={stats.system_health === 'Error' ? 'red' : 'green'}
-                            delay={400}
-                        />
+                        <div className="animate-fade-in-up" style={{ animationDelay: '100ms' }}>
+                            <StatsWidget
+                                icon={<Users size={24} />}
+                                label="Online Users"
+                                value={stats.online_users.toLocaleString()}
+                                subtext="Active community members"
+                                color="blue"
+                                animate={true}
+                                delay={100}
+                            />
+                        </div>
+                        <div className="animate-fade-in-up" style={{ animationDelay: '200ms' }}>
+                            <StatsWidget
+                                icon={<MessageSquare size={24} />}
+                                label="Messages Today"
+                                value={stats.messages_today.toLocaleString()}
+                                subtext="Conversations happening"
+                                color="green"
+                                delay={200}
+                            />
+                        </div>
+                        <div className="animate-fade-in-up" style={{ animationDelay: '300ms' }}>
+                            <StatsWidget
+                                icon={<Video size={24} />}
+                                label="Active Streams"
+                                value={stats.active_streams}
+                                subtext="Live right now"
+                                color="purple"
+                                animate={stats.active_streams > 0}
+                                delay={300}
+                            />
+                        </div>
+                        <div className="animate-fade-in-up" style={{ animationDelay: '400ms' }}>
+                            <StatsWidget
+                                icon={<Activity size={24} />}
+                                label="System Health"
+                                value={stats.system_health}
+                                subtext="All systems operational"
+                                color={stats.system_health === 'Error' ? 'red' : 'green'}
+                                delay={400}
+                            />
+                        </div>
                     </div>
 
                     {/* Getting Started Panel */}
-                    <GettingStartedPanel />
+                    <div className="mt-8 animate-fade-in-up" style={{ animationDelay: '500ms' }}>
+                        <GettingStartedPanel />
+                    </div>
                 </div>
             </main>
         </div>

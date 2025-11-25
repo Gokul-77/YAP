@@ -39,14 +39,14 @@ function App() {
       <Routes>
         <Route path="/" element={<Landing />} />
 
-        <Route path="/dashboard" element={isAuthenticated ? <Dashboard /> : <Navigate to="/login" />} />
-        <Route path="/profile" element={isAuthenticated ? <Profile /> : <Navigate to="/login" />} />
-        <Route path="/admin" element={isAuthenticated ? <AdminPanel /> : <Navigate to="/login" />} />
-        <Route path="/chat" element={isAuthenticated ? <Chat /> : <Navigate to="/login" />} />
-        <Route path="/chat/:roomId" element={isAuthenticated ? <Chat /> : <Navigate to="/login" />} />
-        <Route path="/chat/create-group" element={isAuthenticated ? <CreateGroup /> : <Navigate to="/login" />} />
-        <Route path="/streaming" element={isAuthenticated ? <Streaming /> : <Navigate to="/login" />} />
-        <Route path="/streaming/create" element={isAuthenticated ? <CreateStream /> : <Navigate to="/login" />} />
+        <Route path="/dashboard" element={isAuthenticated ? <Dashboard /> : <Navigate to="/" />} />
+        <Route path="/profile" element={isAuthenticated ? <Profile /> : <Navigate to="/" />} />
+        <Route path="/admin" element={isAuthenticated ? <AdminPanel /> : <Navigate to="/" />} />
+        <Route path="/chat" element={isAuthenticated ? <Chat /> : <Navigate to="/" />} />
+        <Route path="/chat/:roomId" element={isAuthenticated ? <Chat /> : <Navigate to="/" />} />
+        <Route path="/chat/create-group" element={isAuthenticated ? <CreateGroup /> : <Navigate to="/" />} />
+        <Route path="/streaming" element={isAuthenticated ? <Streaming /> : <Navigate to="/" />} />
+        <Route path="/streaming/create" element={isAuthenticated ? <CreateStream /> : <Navigate to="/" />} />
       </Routes>
     </Router>
   );
