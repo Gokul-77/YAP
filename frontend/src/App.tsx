@@ -22,6 +22,8 @@ function App() {
     document.documentElement.classList.toggle('dark', theme === 'dark');
   }, [fetchUser, theme]);
 
+  console.log('App Render:', { isAuthenticated, isLoading, path: window.location.pathname });
+
   // Show loading while checking authentication
   if (isLoading) {
     return (

@@ -1,7 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import { useAuthStore } from '../store/authStore';
-import { useThemeStore } from '../store/themeStore';
 import Sidebar from '../components/Sidebar';
 import WelcomeSection from '../components/dashboard/WelcomeSection';
 import StatsWidget from '../components/dashboard/StatsWidget';
@@ -18,7 +17,6 @@ interface DashboardStats {
 
 export default function Dashboard() {
     const { user } = useAuthStore();
-    const { theme, toggleTheme } = useThemeStore();
     const navigate = useNavigate();
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const [currentView, setCurrentView] = useState<string>('/dashboard');
@@ -79,16 +77,6 @@ export default function Dashboard() {
                 <div className="absolute inset-0 overflow-hidden pointer-events-none">
                     <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-purple-900/20 rounded-full blur-[120px] animate-pulse" />
                     <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-blue-900/20 rounded-full blur-[120px] animate-pulse delay-1000" />
-                </div>
-
-                {/* Theme Toggle - Top Right */}
-                <div className="absolute top-4 right-4 z-20">
-                    <button
-                        onClick={toggleTheme}
-                        className="p-2 rounded-lg bg-white/5 border border-white/10 hover:bg-white/10 transition-colors shadow-md backdrop-blur-sm"
-                    >
-                        {theme === 'light' ? '🌙' : '☀️'}
-                    </button>
                 </div>
 
                 {/* Dashboard Content */}
