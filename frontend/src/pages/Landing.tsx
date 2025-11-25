@@ -137,10 +137,13 @@ export default function Landing() {
 
                     {/* LOGIN CARD */}
                     <div
-                        className={`absolute w-full bg-[#1a1f2e] border border-white/10 p-8 rounded-3xl shadow-2xl transition-all duration-500 ease-in-out transform ${authMode === 'login'
-                                ? 'translate-x-0 pointer-events-auto z-20'
-                                : '-translate-x-[110%] pointer-events-none z-10'
+                        className={`absolute w-full bg-[#1a1f2e] border border-white/10 p-8 rounded-3xl shadow-2xl transition-all duration-500 ease-in-out ${authMode === 'login'
+                                ? 'z-20 animate-slide-in-left'
+                                : 'z-10 animate-slide-out-left pointer-events-none'
                             }`}
+                        style={{
+                            animationFillMode: 'forwards'
+                        }}
                     >
                         <div className="text-center mb-8">
                             <h2 className="text-3xl font-bold mb-2">Welcome Back</h2>
@@ -214,10 +217,13 @@ export default function Landing() {
 
                     {/* SIGNUP CARD */}
                     <div
-                        className={`absolute w-full bg-[#1a1f2e] border border-white/10 p-8 rounded-3xl shadow-2xl transition-all duration-500 ease-in-out transform ${authMode === 'signup'
-                                ? 'translate-x-0 pointer-events-auto z-20'
-                                : 'translate-x-[110%] pointer-events-none z-10'
+                        className={`absolute w-full bg-[#1a1f2e] border border-white/10 p-8 rounded-3xl shadow-2xl transition-all duration-500 ease-in-out ${authMode === 'signup'
+                                ? 'z-20 animate-slide-in-right'
+                                : 'z-10 animate-slide-out-right pointer-events-none'
                             }`}
+                        style={{
+                            animationFillMode: 'forwards'
+                        }}
                     >
                         {signupSuccess ? (
                             <div className="text-center py-12">

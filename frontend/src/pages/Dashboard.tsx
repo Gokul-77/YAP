@@ -108,7 +108,7 @@ export default function Dashboard() {
                     </div>
 
                     {/* Real-Time Stats Row */}
-                    <div className="mt-8 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+                    <div className="mt-8 grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-4">
                         <div className="animate-fade-in-up" style={{ animationDelay: '100ms' }}>
                             <StatsWidget
                                 icon={<Users size={24} />}

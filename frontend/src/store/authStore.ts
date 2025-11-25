@@ -22,7 +22,7 @@ interface AuthState {
 export const useAuthStore = create<AuthState>((set) => ({
     user: null,
     isAuthenticated: false,
-    isLoading: false,
+    isLoading: !!localStorage.getItem('access_token'),
 
     login: async (username: string, password: string) => {
         set({ isLoading: true });

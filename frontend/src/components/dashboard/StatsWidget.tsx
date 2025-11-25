@@ -44,19 +44,19 @@ export default function StatsWidget({
             className={`relative overflow-hidden rounded-xl border p-4 transition-all duration-500 hover:shadow-lg hover:shadow-purple-500/10 bg-white/5 backdrop-blur-sm border-white/10 ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'
                 }`}
         >
-            <div className="flex items-start justify-between">
-                <div>
-                    <p className="text-sm font-medium text-gray-400">{label}</p>
-                    <div className="mt-2 flex items-baseline gap-2">
+            <div className="flex items-start justify-between gap-4">
+                <div className="min-w-0 flex-1">
+                    <p className="text-sm font-medium text-gray-400 truncate">{label}</p>
+                    <div className="mt-2 flex flex-col sm:flex-row sm:items-baseline gap-1 sm:gap-2">
                         <span className="text-2xl font-bold text-white">
                             {value}
                         </span>
                         {subtext && (
-                            <span className="text-xs text-gray-500">{subtext}</span>
+                            <span className="text-xs text-gray-500 truncate">{subtext}</span>
                         )}
                     </div>
                 </div>
-                <div className={`rounded-lg p-2 ${styles.bg} ${styles.text} border ${styles.border}`}>
+                <div className={`rounded-lg p-2 shrink-0 ${styles.bg} ${styles.text} border ${styles.border}`}>
                     {icon}
                 </div>
             </div>
