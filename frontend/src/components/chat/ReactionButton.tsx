@@ -3,12 +3,11 @@ import { Plus } from 'lucide-react';
 interface ReactionButtonProps {
     onClick: () => void;
     isVisible: boolean;
-    isMobile: boolean;
 }
 
-export default function ReactionButton({ onClick, isVisible, isMobile }: ReactionButtonProps) {
-    // Always show on mobile, show on hover for desktop
-    const shouldShow = isMobile || isVisible;
+export default function ReactionButton({ onClick, isVisible }: ReactionButtonProps) {
+    // Only show on hover (desktop and mobile)
+    const shouldShow = isVisible;
 
     return (
         <button

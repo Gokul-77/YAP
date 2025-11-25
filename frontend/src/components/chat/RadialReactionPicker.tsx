@@ -5,7 +5,7 @@ interface RadialReactionPickerProps {
     onClose: () => void;
 }
 
-const REACTIONS = ['✨', '🔥', '💯', '⚡', '🎯', '💜'];
+const REACTIONS = ['🔥', '💯', '⚡', '🎯', '💜'];
 
 export default function RadialReactionPicker({ onSelect, onClose }: RadialReactionPickerProps) {
     const [selectedIndex, setSelectedIndex] = useState<number | null>(null);

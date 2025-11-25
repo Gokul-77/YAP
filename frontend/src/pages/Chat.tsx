@@ -73,6 +73,7 @@ export default function Chat() {
     const [sidebarOpen, setSidebarOpen] = useState(true);
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const [isMobileView, setIsMobileView] = useState(window.innerWidth < 768);
+    const [activeReactionPickerMessageId, setActiveReactionPickerMessageId] = useState<number | null>(null);
 
     // Handle window resize
     useEffect(() => {
@@ -237,11 +238,11 @@ export default function Chat() {
                 return { ...msg, reactions: newReactions };
             }));
 
-            // API Call with correct URL
+            // API Call with correct URL (with trailing slash for Django)
             if (isAdding) {
-                await api.post(`/chat/rooms/${roomId}/messages/${messageId}/react`, { emoji });
+                await api.post(`/chat/rooms/${roomId}/messages/${messageId}/react/`, { emoji });
             } else {
-                await api.delete(`/chat/rooms/${roomId}/messages/${messageId}/react`, { data: { emoji } });
+                await api.delete(`/chat/rooms/${roomId}/messages/${messageId}/react/`, { data: { emoji } });
             }
         } catch (error) {
             console.error('Error updating reaction:', error);
@@ -482,6 +483,12 @@ export default function Chat() {
                                     }))}
                                     onReaction={(emoji, isAdding) => handleReaction(msg.id, emoji, isAdding)}
                                     isGroupChat={currentRoom?.type === 'GROUP'}
+                                    showReactionPicker={activeReactionPickerMessageId === msg.id}
+                                    onToggleReactionPicker={() => {
+                                        setActiveReactionPickerMessageId(
+                                            activeReactionPickerMessageId === msg.id ? null : msg.id
+                                        );
+                                    }}
                                 />
                             );
                         })}

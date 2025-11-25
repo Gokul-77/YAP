@@ -46,9 +46,9 @@ class ChatRoomViewSet(viewsets.ModelViewSet):
         serializer = MessageSerializer(messages, many=True, context={'request': request})
         return Response(serializer.data)
     
-    @action(detail=True, methods=['post'], url_path='messages/(?P<message_id>[^/.]+)/react')
-    def add_reaction(self, request, pk=None, message_id=None):
-        """Add emoji reaction to a message"""
+    @action(detail=True, methods=['post', 'delete'], url_path='messages/(?P<message_id>[^/.]+)/react')
+    def react_to_message(self, request, pk=None, message_id=None):
+        """Add or remove emoji reaction to/from a message"""
         room = self.get_object()
         emoji = request.data.get('emoji')
         
@@ -60,38 +60,41 @@ class ChatRoomViewSet(viewsets.ModelViewSet):
         except Message.DoesNotExist:
             return Response({'error': 'Message not found'}, status=status.HTTP_404_NOT_FOUND)
         
-        # ONE REACTION PER USER RULE: Remove any existing reaction from this user
-        Reaction.objects.filter(message=message, user=request.user).delete()
+        if request.method == 'POST':
+            # ONE REACTION PER USER RULE: Remove any existing reaction from this user
+            Reaction.objects.filter(message=message, user=request.user).delete()
+            
+            # Add new reaction
+            Reaction.objects.create(
+                message=message,
+                user=request.user,
+                emoji=emoji
+            )
+        elif request.method == 'DELETE':
+            # Remove reaction
+            try:
+                reaction = Reaction.objects.get(message=message, user=request.user, emoji=emoji)
+                reaction.delete()
+            except Reaction.DoesNotExist:
+                pass
         
-        # Add new reaction
-        Reaction.objects.create(
-            message=message,
-            user=request.user,
-            emoji=emoji
+        # Broadcast reaction update via WebSocket
+        from channels.layers import get_channel_layer
+        from asgiref.sync import async_to_sync
+        
+        channel_layer = get_channel_layer()
+        async_to_sync(channel_layer.group_send)(
+            f'chat_{room.id}',
+            {
+                'type': 'reaction_update',
+                'message_id': message_id,
+                'emoji': emoji,
+                'user_id': request.user.id,
+                'action': 'add' if request.method == 'POST' else 'remove'
+            }
         )
         
         # Return updated message
-        serializer = MessageSerializer(message, context={'request': request})
-        return Response(serializer.data)
-    
-    @action(detail=True, methods=['delete'], url_path='messages/(?P<message_id>[^/.]+)/react')
-    def remove_reaction(self, request, pk=None, message_id=None):
-        """Remove emoji reaction from a message"""
-        room = self.get_object()
-        emoji = request.data.get('emoji')
-        
-        if not emoji:
-            return Response({'error': 'emoji required'}, status=status.HTTP_400_BAD_REQUEST)
-        
-        try:
-            message = Message.objects.get(id=message_id, room=room)
-            reaction = Reaction.objects.get(message=message, user=request.user, emoji=emoji)
-            reaction.delete()
-        except (Message.DoesNotExist, Reaction.DoesNotExist):
-            pass
-        
-        # Return updated message
-        message = Message.objects.get(id=message_id)
         serializer = MessageSerializer(message, context={'request': request})
         return Response(serializer.data)
 

@@ -50,26 +50,26 @@ export default function ReactionBadge({
         >
             <button
                 onClick={handleClick}
-                className={`relative inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-full text-sm font-semibold shadow-lg border-2 transition-all duration-300 touch-target ${isRemoving ? 'animate-shake' : 'hover:scale-110 active:scale-95'
+                className={`relative inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-semibold shadow-lg border-2 transition-all duration-300 touch-target ${isRemoving ? 'animate-shake' : 'hover:scale-110 active:scale-95'
                     } ${isUpdating ? 'scale-125' : ''} ${userReacted
                         ? 'holographic-gradient text-white border-[var(--cosmic-purple)] scale-105 shadow-xl shadow-purple-500/40'
                         : 'bg-[var(--deep-space)] text-[#e9edef] border-white/30 hover:bg-[var(--cosmic-purple)]/20 hover:border-[var(--cosmic-purple)]/70'
                     }`}
                 style={{
                     zIndex: 10 - index,
-                    minWidth: '36px',
-                    minHeight: '36px'
+                    minWidth: '28px',
+                    minHeight: '28px'
                 }}
                 aria-label={`${users.join(', ')} reacted with ${emoji}`}
             >
-                <span className="text-lg leading-none">{emoji}</span>
+                <span className="text-sm leading-none">{emoji}</span>
                 {count > 1 && (
                     <span className="text-xs font-bold">{count}</span>
                 )}
 
                 {/* Remove indicator for user's own reaction */}
                 {userReacted && (
-                    <X size={11} className="absolute -top-1 -right-1 bg-[var(--cosmic-purple)] rounded-full p-0.5" />
+                    <X size={10} className="absolute -top-1 -right-1 bg-[var(--cosmic-purple)] rounded-full p-0.5" />
                 )}
             </button>
 

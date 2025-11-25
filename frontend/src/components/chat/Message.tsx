@@ -16,9 +16,12 @@ interface MessageProps {
     reactions?: { emoji: string; count: number; userReacted: boolean; users: { username: string }[] }[];
     onReaction?: (emoji: string, isAdding: boolean) => void;
     isGroupChat?: boolean;
+    showReactionPicker?: boolean;
+    onToggleReactionPicker?: () => void;
 }
 
 export default function Message({
+    id,
     content,
     sender,
     timestamp,
@@ -26,14 +29,15 @@ export default function Message({
     isRead,
     reactions = [],
     onReaction,
-    isGroupChat
+    isGroupChat,
+    showReactionPicker = false,
+    onToggleReactionPicker
 }: MessageProps) {
-    const [showReactionPicker, setShowReactionPicker] = useState(false);
     const [isHovered, setIsHovered] = useState(false);
     const { isMobile } = useResponsive();
     const longPressHandlers = useLongPress(() => {
-        if (isMobile) {
-            setShowReactionPicker(true);
+        if (isMobile && onToggleReactionPicker) {
+            onToggleReactionPicker();
         }
     });
 
@@ -45,7 +49,7 @@ export default function Message({
     const handleReaction = (emoji: string) => {
         const existingReaction = reactions.find(r => r.emoji === emoji);
         onReaction?.(emoji, !existingReaction?.userReacted);
-        setShowReactionPicker(false);
+        onToggleReactionPicker?.();
     };
 
     const handleRemoveReaction = (emoji: string) => {
@@ -97,18 +101,18 @@ export default function Message({
 
                 {/* Reaction Button (+ button) */}
                 <ReactionButton
-                    onClick={() => setShowReactionPicker(true)}
+                    onClick={() => onToggleReactionPicker?.()}
                     isVisible={isHovered}
-                    isMobile={isMobile}
                 />
 
                 {/* Reaction Picker */}
                 {showReactionPicker && (
-                    <div className="absolute -bottom-2 right-0 z-50">
+                    <div className={`absolute -bottom-2 ${isMe ? 'right-0' : 'left-0'} z-50`}>
                         <ReactionPicker
                             onSelect={handleReaction}
-                            onClose={() => setShowReactionPicker(false)}
+                            onClose={() => onToggleReactionPicker?.()}
                             position="above"
+                            alignment={isMe ? 'right' : 'left'}
                         />
                     </div>
                 )}
