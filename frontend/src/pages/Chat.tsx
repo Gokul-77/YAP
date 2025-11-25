@@ -178,7 +178,10 @@ export default function Chat() {
 
     const sendMessage = () => {
         if (!newMessage.trim() || !ws || !user) return;
-        ws.send(JSON.stringify({ message: newMessage }));
+        ws.send(JSON.stringify({
+            message: newMessage,
+            user_id: user.id
+        }));
         setNewMessage('');
     };
 
@@ -234,11 +237,11 @@ export default function Chat() {
                 return { ...msg, reactions: newReactions };
             }));
 
-            // API Call
+            // API Call with correct URL
             if (isAdding) {
-                await api.post(`/chat/messages/${messageId}/reaction/`, { emoji });
+                await api.post(`/chat/rooms/${roomId}/messages/${messageId}/react`, { emoji });
             } else {
-                await api.delete(`/chat/messages/${messageId}/reaction/`);
+                await api.delete(`/chat/rooms/${roomId}/messages/${messageId}/react`, { data: { emoji } });
             }
         } catch (error) {
             console.error('Error updating reaction:', error);
